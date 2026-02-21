@@ -24,6 +24,20 @@ func configureDevice(client *wgctrl.Client, settings Settings) (err error) {
 	return nil
 }
 
+func configureAmneziaWG(device userspaceDevice, settings Settings) error {
+	if settings.Implementation != "amneziawg" || settings.AmneziaWG.IsZero() {
+		return nil
+	}
+
+	uapiConfig := settings.AmneziaWG.UAPIConfig()
+	err := device.IpcSet(uapiConfig)
+	if err != nil {
+		return fmt.Errorf("applying amneziawg userspace settings: %w", err)
+	}
+
+	return nil
+}
+
 func makeDeviceConfig(settings Settings) (config wgtypes.Config, err error) {
 	privateKey, err := wgtypes.ParseKey(settings.PrivateKey)
 	if err != nil {
